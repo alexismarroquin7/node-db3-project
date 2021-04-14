@@ -33,7 +33,7 @@ const checkSchemeId = async (req, res, next) => {
 const validateScheme = async (req, res, next) => {
 
   try {
-    if(req.body.scheme_name && typeof req.body.scheme_name === 'string'){
+    if(req.body.scheme_name && req.body.scheme_name !== '' && typeof req.body.scheme_name === 'string'){
       const schemes = await Schemes.find();
       const schemesWithSameName = schemes.filter(scheme => scheme.scheme_name === req.body.scheme_name);
       if(schemesWithSameName.length === 0){
@@ -61,7 +61,19 @@ const validateScheme = async (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
-
+  const { instructions, step_number } = req.body;
+  if(
+      instructions &&
+      instructions !== '' &&
+      typeof instructions === 'string' &&
+      step_number &&
+      typeof step_number === 'number' &&
+      step_number > 0
+    ){ 
+      next();
+    } else {
+      res.status(400).json({ message: 'invalid step' })
+    }
 }
 
 module.exports = {
