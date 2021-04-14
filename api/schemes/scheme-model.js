@@ -150,10 +150,12 @@ function findSteps(scheme_id) { // EXERCISE C
       .orderBy('st.step_number', 'asc');
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
+  const [ scheme_id ] = await db('schemes as sc').insert(scheme);
+  return findById(scheme_id);
 }
 
 function addStep(scheme_id, step) { // EXERCISE E

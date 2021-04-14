@@ -30,8 +30,25 @@ const checkSchemeId = async (req, res, next) => {
     "message": "invalid scheme_name"
   }
 */
-const validateScheme = (req, res, next) => {
+const validateScheme = async (req, res, next) => {
 
+  try {
+    if(req.body.scheme_name && typeof req.body.scheme_name === 'string'){
+      const schemes = await Schemes.find();
+      const schemesWithSameName = schemes.filter(scheme => scheme.scheme_name === req.body.scheme_name);
+      if(schemesWithSameName.length === 0){
+        console.log("Happy path - validateScheme", req.body);
+        next();
+      } else {
+        console.log("Sad path - validateScheme - name not unique", req.body);
+        res.status(400).json({ message: `invalid scheme_name` });  
+      }
+    } else {
+      res.status(400).json({ message: `invalid scheme_name` });
+    }
+  } catch(err) {
+    next(err)
+  }
 }
 
 /*
