@@ -97,25 +97,29 @@ async function findById(scheme_id) { // EXERCISE B
     .select('sc.scheme_name', 'st.*') // columns to display
     .where('sc.scheme_id', scheme_id) // where scheme_id === req.params.scheme_id
     .orderBy('st.step_number', 'asc'); // ordering by step_number in ascending order
-  const scheme_name = rows[0].scheme_name;
-  const stepsToReturn = rows.map(row => {
-    if(!row.step_id){
-      return;
-    }
-    return {
-      step_id: row.step_id,
-      step_number: row.step_number,
-      instructions: row.instructions  
-    }
-  });
-  if(stepsToReturn[0] === undefined){
-    const steps = [];
-    const result = { scheme_id, scheme_name, steps };
-    return result;  
+  if(rows.length === 0){
+    return null;
   } else {
-    const steps = stepsToReturn;
-    const result = { scheme_id, scheme_name, steps };
-    return result;
+    const scheme_name = rows[0].scheme_name;
+    const stepsToFormat = rows.map(row => {
+      if(!row.step_id){
+        return;
+      }
+      return {
+        step_id: row.step_id,
+        step_number: row.step_number,
+        instructions: row.instructions  
+      }
+    });
+    if(stepsToFormat[0] === undefined){
+      const steps = [];
+      const result = { scheme_id: Number(scheme_id), scheme_name, steps };
+      return result;  
+    } else {
+      const steps = stepsToFormat;
+      const result = { scheme_id: Number(scheme_id), scheme_name, steps };
+      return result;
+    }
   }
 }
 
@@ -140,6 +144,10 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+  return db('steps as st')
+      .join('schemes as sc', 'st.scheme_id', 'sc.scheme_id')
+      .where('st.scheme_id', scheme_id)
+      .orderBy('st.step_number', 'asc');
 }
 
 function add(scheme) { // EXERCISE D
